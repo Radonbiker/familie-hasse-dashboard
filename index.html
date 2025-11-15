@@ -8,10 +8,8 @@
     :root {
       --bg-top: #2b1b13;
       --bg-bottom: #140d0a;
-      --wood: #3c2417;
       --wood-light: #5a3722;
       --card: #22140e;
-      --card-alt: #2c1a11;
       --accent: #e0a15b;
       --accent-soft: #f3c48a;
       --text-main: #f6e7d5;
@@ -97,11 +95,11 @@
       color: var(--text-soft);
     }
 
-    /* Layout: Querformat */
+    /* Layout quer: links Liste, rechts Wochen */
     .layout-row {
       display: grid;
-      grid-template-columns: minmax(320px, 1.2fr) minmax(480px, 2fr);
-      gap: 12px;
+      grid-template-columns: minmax(260px, 0.9fr) minmax(520px, 1.6fr);
+      gap: 10px;
       align-items: start;
     }
 
@@ -111,7 +109,7 @@
       }
     }
 
-    /* Meal library */
+    /* ---------- Kompakte Meal-Liste (Emoji + Trenner + Lösch-Icon) ---------- */
 
     .meal-library {
       display: flex;
@@ -120,125 +118,95 @@
     }
 
     .meal-list {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      max-height: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      max-height: 430px;
       overflow-y: auto;
       padding-right: 4px;
     }
 
     .meal-card {
-      background: radial-gradient(circle at top left, #5d3722 0, #24140d 55%, #140b07 100%);
-      border-radius: 14px;
-      overflow: hidden;
+      display: flex;
+      align-items: center;
+      background: rgba(0,0,0,0.28);
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 0.90rem;
       cursor: grab;
-      border: 1px solid rgba(0,0,0,0.4);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.6);
-      display: grid;
-      grid-template-columns: 2fr 3fr;
-      min-height: 90px;
+      border: 1px solid rgba(255,255,255,0.05);
+      min-height: 34px;
     }
 
     .meal-card:active {
       cursor: grabbing;
-      transform: translateY(1px);
+      opacity: 0.8;
     }
 
-    .meal-image-wrap {
-      position: relative;
-      overflow: hidden;
-      background: #3a2418;
-    }
-
-    .meal-image-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      filter: saturate(1.15);
-    }
-
-    .meal-info {
-      padding: 8px 10px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 4px;
+    .meal-emoji {
+      font-size: 1.25rem;
+      margin-right: 6px;
     }
 
     .meal-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: #fdf4e5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 130px;
+      font-size: 0.9rem;
     }
 
-    .meal-sub {
-      font-size: 0.78rem;
-      color: var(--text-soft);
+    .meal-sep {
+      flex: 1;
+      border-bottom: 1px solid rgba(255,255,255,0.16);
+      margin: 0 8px;
+    }
+
+    .meal-delete {
+      cursor: pointer;
+      font-size: 1.05rem;
+      opacity: 0.8;
+    }
+
+    .meal-delete:hover {
+      opacity: 1;
     }
 
     .meal-form {
       display: flex;
       flex-direction: column;
       gap: 6px;
-      margin-top: 4px;
-    }
-
-    .meal-form-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
+      margin-top: 8px;
     }
 
     .meal-form input {
-      flex: 1 1 auto;
-      min-width: 0;
+      width: 100%;
+      padding: 7px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.1);
-      padding: 7px 11px;
-      font-size: 0.85rem;
+      border: 1px solid rgba(255,255,255,0.12);
       background: rgba(10,6,4,0.9);
       color: var(--text-main);
+      font-size: 0.85rem;
     }
 
     .meal-form input::placeholder {
       color: #8f6d4d;
     }
 
-    .btn {
+    .meal-form button {
+      width: 100%;
+      padding: 7px 10px;
       border-radius: 999px;
       border: none;
-      padding: 7px 14px;
-      font-size: 0.82rem;
       background: var(--accent);
       color: #24140c;
+      font-size: 0.9rem;
+      font-weight: 600;
       cursor: pointer;
       box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-      white-space: nowrap;
-      font-weight: 600;
     }
 
-    .btn.small {
-      padding: 6px 10px;
-      font-size: 0.78rem;
-    }
-
-    .btn.secondary {
-      background: #4a3220;
-      color: var(--text-soft);
-    }
-
-    .btn:hover {
-      filter: brightness(1.05);
-    }
-
-    .btn:active {
-      transform: translateY(1px);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
-    }
-
-    /* Weeks */
+    /* ---------- Wochen & Slots ---------- */
 
     .weeks-panel {
       display: flex;
@@ -249,10 +217,10 @@
     .weeks-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 8px;
     }
 
-    @media (max-width: 1024px) {
+    @media (max-width: 1200px) {
       .weeks-grid {
         grid-template-columns: 1fr;
       }
@@ -261,7 +229,7 @@
     .week {
       background: radial-gradient(circle at top, rgba(73,47,29,0.9) 0, rgba(19,11,7,0.98) 60%);
       border-radius: 14px;
-      padding: 10px;
+      padding: 9px;
       border: 1px solid rgba(255,255,255,0.03);
       box-shadow: 0 7px 18px rgba(0,0,0,0.6);
     }
@@ -270,17 +238,17 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .week-header h3 {
       margin: 0;
-      font-size: 1rem;
+      font-size: 0.98rem;
       color: var(--accent-soft);
     }
 
     .week-header span {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       color: var(--text-soft);
     }
 
@@ -317,26 +285,26 @@
     .slot {
       background: radial-gradient(circle at top, #3b2516 0, #1b100a 65%);
       border-radius: 8px;
-      padding: 6px;
-      min-height: 70px;
+      padding: 5px;
+      min-height: 58px;
       border: 1px dashed rgba(255,255,255,0.14);
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
       justify-content: center;
       align-items: stretch;
       transition: background 0.1s, border-color 0.1s, transform 0.08s;
     }
 
     .slot-label {
-      font-size: 0.74rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--text-soft);
     }
 
     .slot.empty .slot-content {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: #705035;
       text-align: center;
     }
@@ -348,7 +316,7 @@
     }
 
     .slot-content {
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-weight: 600;
       color: var(--text-main);
       display: -webkit-box;
@@ -357,8 +325,7 @@
       overflow: hidden;
     }
 
-    /* Shopping list */
-
+    /* Einkaufsliste (falls du sie später wieder nutzen willst) */
     .shopping-actions {
       display: flex;
       flex-wrap: wrap;
@@ -370,7 +337,7 @@
     .shopping-list {
       margin: 0;
       padding-left: 20px;
-      max-height: 180px;
+      max-height: 140px;
       overflow-y: auto;
       font-size: 0.85rem;
     }
@@ -392,7 +359,7 @@
   <div class="app">
     <header>
       <h1><span class="icon">🍽️</span> Familie Hasse – Essensplan</h1>
-      <p>Wandpanel im Flur – zwei Wochen im Blick. Gerichte antippen, ziehen & planen.</p>
+      <p>Wandpanel im Flur – kompakte Emoji-Liste & zwei Wochen im Blick.</p>
     </header>
 
     <div class="content">
@@ -400,25 +367,21 @@
         <!-- Meal library -->
         <section class="panel meal-library">
           <h2>Gerichte</h2>
-          <small>Gericht antippen & ziehen, dann in einen Tag/Slot fallen lassen.</small>
+          <small>Gericht per Emoji + Name anlegen. Zum Planen einfach ziehen.</small>
           <div id="meal-list" class="meal-list"></div>
           <form id="meal-form" class="meal-form">
-            <div class="meal-form-row">
-              <input id="meal-name" type="text" placeholder="Neues Gericht (z. B. Spinat mit Kartoffeln)" required />
-            </div>
-            <div class="meal-form-row">
-              <input id="meal-image" type="url" placeholder="Bild-URL (optional – Rezeptfoto o.ä.)" />
-              <button type="submit" class="btn small">➕ Gericht hinzufügen</button>
-            </div>
+            <input id="meal-name" type="text" placeholder="Gericht (z. B. Spinat mit Kartoffeln)" required />
+            <input id="meal-emoji" type="text" placeholder="Emoji (z. B. 🍕) – optional" />
+            <button type="submit">➕ Gericht hinzufügen</button>
           </form>
-          <small>Die Gerichte bleiben auf dem Wand-iPad gespeichert. Liste kann jederzeit erweitert werden.</small>
+          <small>Gerichte bleiben lokal auf diesem Wand-iPad gespeichert. Jede Karte hat rechts ein 🗑 zum Löschen.</small>
         </section>
 
         <!-- Weeks + shopping -->
         <section class="weeks-panel">
           <section class="panel">
             <h2>Wochenplan</h2>
-            <small>Links aktuelle Woche, rechts nächste Woche. Tippen auf einen Slot löscht den Eintrag nach Bestätigung.</small>
+            <small>Links aktuelle Woche, rechts nächste Woche. Tippen auf einen Slot löscht den Eintrag (mit Nachfrage).</small>
             <div class="weeks-grid">
               <section class="week" data-week="0">
                 <div class="week-header">
@@ -433,7 +396,7 @@
                   <h3>Nächste Woche</h3>
                   <span id="week1-range"></span>
                 </div>
-                <div class="week-grid" id="week1-grid"></div>
+                  <div class="week-grid" id="week1-grid"></div>
               </section>
             </div>
           </section>
@@ -456,17 +419,17 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "familie_hasse_essenplan_v3";
+    const STORAGE_KEY = "familie_hasse_essenplan_v4";
 
     const defaultMeals = [
-      { id: "pizza", name: "Pizza Margherita", image: "https://images.pexels.com/photos/825661/pexels-photo-825661.jpeg?auto=compress&cs=tinysrgb&w=800" },
-      { id: "nudeln-bolo", name: "Nudeln Bolognese", image: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=800" },
-      { id: "spinat-kartoffeln", name: "Spinat mit Kartoffeln", image: "https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg?auto=compress&cs=tinysrgb&w=800" },
-      { id: "haehnchen-gemuese", name: "Hähnchen mit Gemüse", image: "https://images.pexels.com/photos/4106483/pexels-photo-4106483.jpeg?auto=compress&cs=tinysrgb&w=800" },
-      { id: "fischstaebchen", name: "Fischstäbchen mit Kartoffelbrei", image: "https://images.pexels.com/photos/16049096/pexels-photo-16049096/free-photo-of-meal-fish-and-butternut-squash-on-plate-on-a-tray.jpeg?auto=compress&cs=tinysrgb&w=800" },
-      { id: "pfannkuchen", name: "Pfannkuchen süß", image: "https://images.pexels.com/photos/4109990/pexels-photo-4109990.jpeg?auto=compress&cs=tinysrgb&w=800" },
-      { id: "suppe", name: "Gemüsesuppe", image: "https://images.pexels.com/photos/1438672/pexels-photo-1438672.jpeg?auto=compress&cs=tinysrgb&w=800" },
-      { id: "burger", name: "Burger & Ofenkartoffeln", image: "https://images.pexels.com/photos/1639562/pexels-photo-1639562.jpeg?auto=compress&cs=tinysrgb&w=800" }
+      { id: "pizza", name: "Pizza Margherita", emoji: "🍕" },
+      { id: "nudeln-bolo", name: "Nudeln Bolognese", emoji: "🍝" },
+      { id: "spinat-kartoffeln", name: "Spinat mit Kartoffeln", emoji: "🌱" },
+      { id: "haehnchen-gemuese", name: "Hähnchen mit Gemüse", emoji: "🍗" },
+      { id: "fischstaebchen", name: "Fischstäbchen mit Kartoffelbrei", emoji: "🐟" },
+      { id: "pfannkuchen", name: "Pfannkuchen süß", emoji: "🥞" },
+      { id: "suppe", name: "Gemüsesuppe", emoji: "🍲" },
+      { id: "burger", name: "Burger & Ofenkartoffeln", emoji: "🍔" }
     ];
 
     const dayNames = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
@@ -484,7 +447,7 @@
       const day = d.getDay();
       const diff = (day === 0 ? -6 : 1 - day);
       d.setDate(d.getDate() + diff);
-      d.setHours(0,0,0,0);
+      d.setHours(0, 0, 0, 0);
       return d;
     }
 
@@ -529,6 +492,13 @@
           state.week0Monday = currentMonday.toISOString();
         }
 
+        // Falls altes Format ohne emoji existiert
+        state.meals = (state.meals || []).map(m => ({
+          id: m.id,
+          name: m.name,
+          emoji: m.emoji || "🍽️"
+        }));
+
         return state;
       } catch (e) {
         console.error("Fehler beim Laden des Zustands", e);
@@ -561,29 +531,43 @@
         card.draggable = true;
         card.dataset.mealId = meal.id;
 
-        const imgWrap = document.createElement("div");
-        imgWrap.className = "meal-image-wrap";
-        if (meal.image) {
-          const img = document.createElement("img");
-          img.src = meal.image;
-          img.alt = meal.name;
-          imgWrap.appendChild(img);
-        }
+        const emojiSpan = document.createElement("span");
+        emojiSpan.className = "meal-emoji";
+        emojiSpan.textContent = meal.emoji || "🍽️";
 
-        const info = document.createElement("div");
-        info.className = "meal-info";
-        const title = document.createElement("div");
-        title.className = "meal-title";
-        title.textContent = meal.name;
-        const sub = document.createElement("div");
-        sub.className = "meal-sub";
-        sub.textContent = "Ziehen zum Planen";
+        const titleSpan = document.createElement("span");
+        titleSpan.className = "meal-title";
+        titleSpan.textContent = meal.name;
 
-        info.appendChild(title);
-        info.appendChild(sub);
+        const sep = document.createElement("span");
+        sep.className = "meal-sep";
 
-        card.appendChild(imgWrap);
-        card.appendChild(info);
+        const delBtn = document.createElement("span");
+        delBtn.className = "meal-delete";
+        delBtn.textContent = "🗑️";
+        delBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const ok = confirm(`Gericht "${meal.name}" wirklich löschen? Es wird auch aus allen geplanten Tagen entfernt.`);
+          if (!ok) return;
+          // Aus Slots entfernen
+          state.weeks.forEach(week => {
+            week.days.forEach(day => {
+              if (day.lunch === meal.id) day.lunch = null;
+              if (day.dinner === meal.id) day.dinner = null;
+            });
+          });
+          // Aus Liste entfernen
+          state.meals = state.meals.filter(m => m.id !== meal.id);
+          saveState();
+          renderMeals();
+          renderWeeks();
+          renderShoppingList();
+        });
+
+        card.appendChild(emojiSpan);
+        card.appendChild(titleSpan);
+        card.appendChild(sep);
+        card.appendChild(delBtn);
 
         card.addEventListener("dragstart", (e) => {
           e.dataTransfer.setData("text/plain", meal.id);
@@ -647,7 +631,7 @@
       if (mealId) {
         const meal = getMealById(mealId);
         if (meal) {
-          content.textContent = meal.name;
+          content.textContent = (meal.emoji || "🍽️") + " " + meal.name;
           slotEl.classList.remove("empty");
         } else {
           content.textContent = "(Gericht gelöscht)";
@@ -684,11 +668,12 @@
         const currentId = state.weeks[weekIndex].days[dayIndex][slotKey];
         if (!currentId) return;
         const meal = getMealById(currentId);
-        const confirmClear = confirm("Soll \"" + (meal?.name || "dieser Eintrag") + "\" wirklich entfernt werden?");
+        const confirmClear = confirm(`Soll "${meal?.name || "dieser Eintrag"}" wirklich entfernt werden?`);
         if (confirmClear) {
           state.weeks[weekIndex].days[dayIndex][slotKey] = null;
           saveState();
           renderWeeks();
+          renderShoppingList();
         }
       });
 
@@ -727,15 +712,12 @@
       });
     }
 
-    // Event-Handler
-
     document.getElementById("meal-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const nameInput = document.getElementById("meal-name");
-      const imageInput = document.getElementById("meal-image");
+      const emojiInput = document.getElementById("meal-emoji");
       const name = nameInput.value.trim();
-      const image = imageInput.value.trim();
-
+      const emoji = emojiInput.value.trim() || "🍽️";
       if (!name) return;
 
       const idBase = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -745,12 +727,12 @@
         id = idBase + "-" + i++;
       }
 
-      state.meals.push({ id, name, image: image || "" });
+      state.meals.push({ id, name, emoji });
       saveState();
       renderMeals();
 
       nameInput.value = "";
-      imageInput.value = "";
+      emojiInput.value = "";
     });
 
     document.getElementById("btn-generate-shopping").addEventListener("click", () => {
@@ -765,6 +747,7 @@
       renderShoppingList();
     });
 
+    // Initial
     renderMeals();
     renderWeeks();
     renderShoppingList();
