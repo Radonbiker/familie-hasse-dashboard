@@ -14,7 +14,6 @@
       --bg-top: #25160f;
       --bg-bottom: #120a06;
       --card: #1c110b;
-      --card-soft: #26150d;
       --accent: #e0a15b;
       --accent-soft: #f3c48a;
       --border-soft: rgba(255,255,255,0.12);
@@ -43,42 +42,17 @@
       margin: 0 auto;
       padding: 10px 12px 14px;
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 10px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, #4f311e, #1f130d);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
-      border: 1px solid rgba(255,255,255,0.10);
-    }
-
-    header .icon {
-      font-size: 1.6rem;
-    }
-
-    header .title {
-      font-size: 1.15rem;
-      font-weight: 600;
-    }
-
-    header .sub {
-      font-size: 0.75rem;
-      color: var(--text-soft);
-    }
-
-    main {
       display: grid;
-      grid-template-rows: auto minmax(0, 1fr) auto;
+      grid-template-columns: 1.1fr 1.2fr;
+      grid-template-rows: auto 1fr;
       gap: 10px;
-      margin-top: 6px;
-      flex: 1;
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto;
+      }
     }
 
     .card {
@@ -87,6 +61,7 @@
       border: 1px solid var(--border-soft);
       box-shadow: 0 10px 24px rgba(0,0,0,0.6);
       padding: 10px;
+      min-height: 80px;
     }
 
     .card h2 {
@@ -103,29 +78,31 @@
       color: var(--text-soft);
     }
 
-    /* --- Lieblingsgerichte oben --- */
+    /* Layout-Zuordnung */
+    #card-favorites { grid-column: 1; grid-row: 1; }
+    #card-week-current { grid-column: 2; grid-row: 1; }
+    #card-meals { grid-column: 1; grid-row: 2; }
+    #card-week-next { grid-column: 2; grid-row: 2; }
 
-    .favorites-card {
-      min-height: 80px;
+    @media (max-width: 980px) {
+      #card-favorites { grid-column: 1; grid-row: 1; }
+      #card-week-current { grid-column: 1; grid-row: 2; }
+      #card-week-next { grid-column: 1; grid-row: 3; }
+      #card-meals { grid-column: 1; grid-row: 4; }
     }
 
+    /* Lieblingsgerichte */
     .fav-grid {
       margin-top: 6px;
       display: grid;
-      grid-template-columns: repeat(8, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 6px;
     }
-
-    @media (max-width: 1100px) {
-      .fav-grid {
-        grid-template-columns: repeat(6, minmax(0, 1fr));
-      }
+    @media (min-width: 900px) {
+      .fav-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     }
-
-    @media (max-width: 820px) {
-      .fav-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
+    @media (min-width: 1200px) {
+      .fav-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
     }
 
     .fav-bubble {
@@ -145,7 +122,7 @@
       user-select: none;
     }
 
-    .fav-bubble span.emoji {
+    .fav-bubble .emoji {
       font-size: 1.1rem;
     }
 
@@ -155,21 +132,7 @@
       border-color: var(--accent-soft);
     }
 
-    /* --- Mitte: zwei Wochen --- */
-
-    .weeks-row {
-      display: grid;
-      grid-template-columns: 1.1fr 1.1fr;
-      gap: 10px;
-      min-height: 260px;
-    }
-
-    @media (max-width: 980px) {
-      .weeks-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
+    /* Wochenpläne */
     .week-header {
       display: flex;
       justify-content: space-between;
@@ -202,6 +165,16 @@
       text-align: center;
       font-weight: 600;
       margin-bottom: 2px;
+      cursor: pointer;
+    }
+
+    .day-title span {
+      border-radius: 999px;
+      padding: 2px 6px;
+    }
+
+    .day-title span:hover {
+      background: rgba(255,255,255,0.08);
     }
 
     .slot {
@@ -264,14 +237,7 @@
       font-weight: 600;
     }
 
-    /* --- Unten: alle Gerichte --- */
-
-    .meals-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1.4fr);
-      gap: 10px;
-    }
-
+    /* Alle Gerichte */
     .meal-search-row {
       display: flex;
       gap: 6px;
@@ -296,6 +262,7 @@
       flex-direction: column;
       gap: 5px;
       padding-right: 4px;
+      margin-bottom: 4px;
     }
 
     .meal-card {
@@ -322,10 +289,16 @@
       text-overflow: ellipsis;
     }
 
+    .meal-card .edit,
     .meal-card .delete {
       font-size: 1rem;
-      opacity: 0.8;
+      opacity: 0.85;
       cursor: pointer;
+    }
+
+    .meal-card .edit:hover,
+    .meal-card .delete:hover {
+      opacity: 1;
     }
 
     .meal-card.selected {
@@ -335,7 +308,7 @@
     }
 
     .meal-form {
-      margin-top: 6px;
+      margin-top: 4px;
       display: flex;
       flex-wrap: wrap;
       gap: 4px;
@@ -354,7 +327,7 @@
     }
 
     .meal-form input[name="name"] {
-      flex: 1.2;
+      flex: 1.3;
     }
 
     .meal-form input[name="emoji"] {
@@ -383,76 +356,64 @@
 </head>
 <body>
   <div class="app">
-    <header>
-      <div class="icon">🍽️</div>
-      <div>
-        <div class="title">Familie Hasse – Essensplan</div>
-        <div class="sub">Lieblingsessen links · zwei Wochen im Blick · alles bleibt lokal gespeichert</div>
+    <!-- Links oben: Lieblingsgerichte -->
+    <section class="card" id="card-favorites">
+      <h2>Lieblingsgerichte</h2>
+      <small>Antippen, dann unten einen Slot berühren. Gelb = aktuell ausgewählt.</small>
+      <div id="fav-grid" class="fav-grid"></div>
+    </section>
+
+    <!-- Rechts oben: aktuelle Woche -->
+    <section class="card" id="card-week-current">
+      <div class="week-header">
+        <span>Aktuelle Woche (Tag antippen = Zutatenliste für den Tag)</span>
+        <span id="week-current-range"></span>
       </div>
-    </header>
+      <div id="week-current" class="week-grid"></div>
+      <div class="week-buttons">
+        <button class="btn primary" id="btn-week-today">Heutiger Tag – Zutaten anzeigen</button>
+        <button class="btn" id="btn-clear-week">Aktuelle Woche leeren</button>
+      </div>
+    </section>
 
-    <main>
-      <!-- Lieblingsgerichte oben -->
-      <section class="card favorites-card">
-        <h2>Lieblingsgerichte</h2>
-        <small>Antippen, dann unten einen Slot berühren. Gelb markiert = aktuell ausgewählt.</small>
-        <div id="fav-grid" class="fav-grid"></div>
-      </section>
+    <!-- Links unten: alle Gerichte -->
+    <section class="card" id="card-meals">
+      <h2>Alle Gerichte</h2>
+      <small>Tap = Gericht auswählen · 📝 Zutaten bearbeiten · 🗑️ löschen.</small>
 
-      <!-- Mitte: zwei Wochen -->
-      <section class="weeks-row">
-        <section class="card">
-          <div class="week-header">
-            <span>Aktuelle Woche</span>
-            <span id="week-current-range"></span>
-          </div>
-          <div id="week-current" class="week-grid"></div>
-          <div class="week-buttons">
-            <button class="btn primary" id="btn-shopping">Einkaufsliste (Gerichte)</button>
-            <button class="btn" id="btn-clear-week">Aktuelle Woche leeren</button>
-          </div>
-        </section>
+      <div class="meal-search-row">
+        <input id="meal-search" placeholder="In Gerichten suchen …" />
+      </div>
 
-        <section class="card">
-          <div class="week-header">
-            <span>Nächste Woche</span>
-            <span id="week-next-range"></span>
-          </div>
-          <div id="week-next" class="week-grid"></div>
-          <div class="week-buttons">
-            <button class="btn" id="btn-clear-all">Beide Wochen leeren</button>
-          </div>
-        </section>
-      </section>
+      <div id="meal-list" class="meal-list"></div>
 
-      <!-- Unten: alle Gerichte -->
-      <section class="meals-row">
-        <section class="card">
-          <h2>Alle Gerichte</h2>
-          <small>Hier könnt ihr neue Gerichte anlegen, auswählen oder löschen. Tap = aktiv für die Slot-Auswahl.</small>
+      <form id="meal-form" class="meal-form">
+        <input name="name" id="meal-name" placeholder="Neues Gericht (z. B. Lasagne)" required />
+        <input name="emoji" id="meal-emoji" placeholder="Emoji 🍝" />
+        <button type="submit">➕ Hinzufügen</button>
+      </form>
+    </section>
 
-          <div class="meal-search-row">
-            <input id="meal-search" placeholder="In Gerichten suchen …" />
-          </div>
-
-          <div id="meal-list" class="meal-list"></div>
-
-          <form id="meal-form" class="meal-form">
-            <input name="name" id="meal-name" placeholder="Neues Gericht (z. B. Spinat mit Kartoffeln)" required />
-            <input name="emoji" id="meal-emoji" placeholder="Emoji 🍝" />
-            <button type="submit">➕ Hinzufügen</button>
-          </form>
-        </section>
-      </section>
-    </main>
-
-    <footer>
-      Alles läuft lokal im Browser auf diesem iPad. Nichts wird hochgeladen – perfekt fürs Familien-Wandpanel. ❤️
-    </footer>
+    <!-- Rechts unten: nächste Woche -->
+    <section class="card" id="card-week-next">
+      <div class="week-header">
+        <span>Nächste Woche (Planung für kommende Tage)</span>
+        <span id="week-next-range"></span>
+      </div>
+      <div id="week-next" class="week-grid"></div>
+      <div class="week-buttons">
+        <button class="btn primary" id="btn-shopping-all">Einkaufsliste für alle geplanten Tage</button>
+        <button class="btn" id="btn-clear-all">Beide Wochen leeren</button>
+      </div>
+    </section>
   </div>
 
+  <footer>
+    Alles läuft lokal im Browser auf diesem iPad. Gerichte, Zutaten & Wochenplan gehören nur euch. ❤️
+  </footer>
+
   <script>
-    const STORAGE_KEY = "familie_hasse_essenplan_v4";
+    const STORAGE_KEY = "familie_hasse_essenplan_v5";
 
     const defaultMeals = [
       {id:"spagbol", name:"Spaghetti Bolognese", emoji:"🍝"},
@@ -495,11 +456,10 @@
 
     function baseState() {
       const currentMonday = getMonday();
-      const nextMonday = new Date(currentMonday);
-      nextMonday.setDate(nextMonday.getDate()+7);
       return {
         meals: [...defaultMeals],
         favorites: [...defaultFavorites],
+        ingredients: {}, // { mealId: ["Zutat 1", "Zutat 2"] }
         weekCurrent: createEmptyWeek(),
         weekNext: createEmptyWeek(),
         currentMondayISO: currentMonday.toISOString()
@@ -514,10 +474,12 @@
 
         if (!st.meals) st.meals = [...defaultMeals];
         if (!st.favorites) st.favorites = [...defaultFavorites];
+        if (!st.ingredients) st.ingredients = {};
         if (!st.weekCurrent) st.weekCurrent = createEmptyWeek();
         if (!st.weekNext) st.weekNext = createEmptyWeek();
         if (!st.currentMondayISO) st.currentMondayISO = getMonday().toISOString();
 
+        // Wochenrotation: wenn eine ganze Woche vergangen ist
         const storedMonday = new Date(st.currentMondayISO);
         const nowMonday = getMonday();
         const diffDays = Math.floor((nowMonday - storedMonday) / (1000*60*60*24));
@@ -557,8 +519,14 @@
       return state.meals.find(m => m.id === id) || null;
     }
 
+    function getIngredientsForMeal(id) {
+      const arr = state.ingredients[id];
+      if (!arr || !arr.length) return ["(keine Zutaten hinterlegt)"];
+      return arr;
+    }
+
     function setActiveMeal(id) {
-      activeTapMealId = activeTapMealId === id ? null : id;
+      activeTapMealId = (activeTapMealId === id ? null : id);
       renderFavorites();
       renderMealList();
     }
@@ -570,10 +538,8 @@
         if (!meal) return;
         const div = document.createElement("div");
         div.className = "fav-bubble" + (activeTapMealId === meal.id ? " active" : "");
-        div.innerHTML = `<span class="emoji">${meal.emoji || "🍽️"}</span><span>${meal.name}</span>`;
-        div.addEventListener("click", () => {
-          setActiveMeal(meal.id);
-        });
+        div.innerHTML = `<div class="emoji">${meal.emoji || "🍽️"}</div><div>${meal.name}</div>`;
+        div.addEventListener("click", () => setActiveMeal(meal.id));
         favGridEl.appendChild(div);
       });
     }
@@ -588,17 +554,39 @@
         card.innerHTML = `
           <span class="emoji">${meal.emoji || "🍽️"}</span>
           <span class="name">${meal.name}</span>
+          <span class="edit">📝</span>
           <span class="delete">🗑️</span>
         `;
+
         card.addEventListener("click", (e) => {
-          if (e.target.classList.contains("delete")) return;
+          const target = e.target;
+          if (target.classList.contains("edit") || target.classList.contains("delete")) return;
           setActiveMeal(meal.id);
         });
+
+        card.querySelector(".edit").addEventListener("click", (e) => {
+          e.stopPropagation();
+          const current = (state.ingredients[meal.id] || []).join(", ");
+          const updated = prompt(
+            `Zutaten für "${meal.name}" (mit Komma trennen):`,
+            current
+          );
+          if (updated === null) return;
+          const parts = updated
+            .split(",")
+            .map(s => s.trim())
+            .filter(s => s.length > 0);
+          state.ingredients[meal.id] = parts;
+          saveState();
+          alert(`Zutaten für "${meal.name}" gespeichert.`);
+        });
+
         card.querySelector(".delete").addEventListener("click", (e) => {
           e.stopPropagation();
           if (!confirm(`"${meal.name}" wirklich löschen?`)) return;
           state.meals = state.meals.filter(m => m.id !== meal.id);
           state.favorites = state.favorites.filter(fid => fid !== meal.id);
+          delete state.ingredients[meal.id];
           state.weekCurrent.forEach(d => {
             if (d.lunch === meal.id) d.lunch = null;
             if (d.dinner === meal.id) d.dinner = null;
@@ -611,6 +599,7 @@
           saveState();
           renderAll();
         });
+
         mealListEl.appendChild(card);
       });
     }
@@ -632,12 +621,18 @@
       weekData.forEach((day, dayIndex) => {
         const col = document.createElement("div");
         col.className = "day-col";
+
         const title = document.createElement("div");
         title.className = "day-title";
-        title.textContent = dayNames[dayIndex];
+        const span = document.createElement("span");
+        span.textContent = dayNames[dayIndex];
+        span.addEventListener("click", () => {
+          showIngredientsForDay(weekIndex, dayIndex);
+        });
+        title.appendChild(span);
         col.appendChild(title);
 
-        ["lunch","dinner"].forEach(slotKey => {
+        ["lunch", "dinner"].forEach(slotKey => {
           const slotEl = document.createElement("div");
           slotEl.className = "slot";
           slotEl.dataset.week = weekIndex;
@@ -657,7 +652,7 @@
             content.textContent = meal ? `${meal.emoji || "🍽️"} ${meal.name}` : "(Gericht fehlt)";
           } else {
             slotEl.classList.add("empty");
-            content.textContent = "Slot antippen zum Füllen / Löschen";
+            content.textContent = "Slot antippen zum Füllen/Löschen";
           }
 
           slotEl.appendChild(label);
@@ -691,6 +686,85 @@
       });
     }
 
+    function showIngredientsForDay(weekIndex, dayIndex) {
+      const weekLabel = weekIndex === 0 ? "Aktuelle Woche" : "Nächste Woche";
+      const dayLabel = dayNames[dayIndex];
+      const weekData = (weekIndex === 0) ? state.weekCurrent : state.weekNext;
+      const day = weekData[dayIndex];
+
+      let text = `${weekLabel} – ${dayLabel}\n\n`;
+
+      ["lunch","dinner"].forEach(slotKey => {
+        const mealId = day[slotKey];
+        const slotLabel = slotKey === "lunch" ? "Mittag" : "Abend";
+        if (!mealId) {
+          text += `${slotLabel}:\n  (kein Gericht eingetragen)\n\n`;
+        } else {
+          const meal = getMealById(mealId);
+          const name = meal ? meal.name : "(Gericht fehlt)";
+          text += `${slotLabel} – ${name}\n`;
+          const ing = getIngredientsForMeal(mealId);
+          ing.forEach(z => {
+            text += `  • ${z}\n`;
+          });
+          text += `\n`;
+        }
+      });
+
+      alert(text);
+    }
+
+    function showIngredientsForToday() {
+      const today = new Date();
+      const todayMonday = getMonday(today);
+      const storedMonday = new Date(state.currentMondayISO);
+
+      const sameWeek =
+        todayMonday.getFullYear() === storedMonday.getFullYear() &&
+        todayMonday.getMonth() === storedMonday.getMonth() &&
+        todayMonday.getDate() === storedMonday.getDate();
+
+      if (!sameWeek) {
+        alert("Heutiger Tag liegt nicht in der aktuellen gespeicherten Woche.");
+        return;
+      }
+
+      let dayIndex = today.getDay(); // 0=So
+      if (dayIndex === 0) dayIndex = 6; else dayIndex = dayIndex - 1;
+      showIngredientsForDay(0, dayIndex);
+    }
+
+    function showIngredientsForAllPlanned() {
+      let text = "Einkaufsliste – alle geplanten Gerichte\n\n";
+
+      function addWeekLabel(weekLabel, weekData) {
+        text += weekLabel + "\n\n";
+        weekData.forEach((day, dayIndex) => {
+          if (!day.lunch && !day.dinner) return;
+          text += dayNames[dayIndex] + "\n";
+          ["lunch","dinner"].forEach(slotKey => {
+            const mealId = day[slotKey];
+            const slotLabel = slotKey === "lunch" ? "Mittag" : "Abend";
+            if (!mealId) return;
+            const meal = getMealById(mealId);
+            const name = meal ? meal.name : "(Gericht fehlt)";
+            text += `  ${slotLabel} – ${name}\n`;
+            const ing = getIngredientsForMeal(mealId);
+            ing.forEach(z => {
+              text += `    • ${z}\n`;
+            });
+          });
+          text += "\n";
+        });
+      }
+
+      addWeekLabel("Aktuelle Woche", state.weekCurrent);
+      addWeekLabel("Nächste Woche", state.weekNext);
+
+      alert(text);
+    }
+
+    // Events
     document.getElementById("meal-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const nameInput = document.getElementById("meal-name");
@@ -732,23 +806,8 @@
       renderWeeks();
     });
 
-    document.getElementById("btn-shopping").addEventListener("click", () => {
-      const names = new Set();
-      [state.weekCurrent, state.weekNext].forEach(week => {
-        week.forEach(day => {
-          ["lunch","dinner"].forEach(k => {
-            const id = day[k];
-            const m = id && getMealById(id);
-            if (m) names.add(m.name);
-          });
-        });
-      });
-      if (names.size === 0) {
-        alert("Noch keine Gerichte geplant.");
-      } else {
-        alert("Geplante Gerichte:\n\n" + Array.from(names).sort().join("\n"));
-      }
-    });
+    document.getElementById("btn-week-today").addEventListener("click", showIngredientsForToday);
+    document.getElementById("btn-shopping-all").addEventListener("click", showIngredientsForAllPlanned);
 
     function renderAll() {
       renderFavorites();
