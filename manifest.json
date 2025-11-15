@@ -1,0 +1,9 @@
+{
+  "name": "Familie Hasse – Essensplan",
+  "short_name": "Essensplan",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a100b",
+  "theme_color": "#1a100b",
+  "icons": []
+}
