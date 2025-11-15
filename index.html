@@ -352,9 +352,60 @@
       padding: 4px 0 6px;
       opacity: 0.9;
     }
+
+    /* Slideshow-Overlay */
+
+    #slideshow-overlay {
+      position: fixed;
+      inset: 0;
+      background: black;
+      z-index: 9999;
+      display: none;
+    }
+
+    #slideshow-inner {
+      position: absolute;
+      inset: 6px 6px 8px 6px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.9);
+      border: 5px solid rgba(0,0,0,0.7);
+      background: black;
+    }
+
+    #slideshow-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: black;
+    }
+
+    #slideshow-overlay .hint {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      background: rgba(0,0,0,0.55);
+      color: var(--text-soft);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
+  <!-- Slideshow Overlay -->
+  <div id="slideshow-overlay">
+    <div id="slideshow-inner">
+      <iframe
+        id="slideshow-iframe"
+        src="https://share.icloud.com/photos/06176aPDvmH0S0jFo7HrxY8_A"
+        title="Familienalbum">
+      </iframe>
+    </div>
+    <div class="hint">Tippen, um zurück zum Essensplan zu wechseln</div>
+  </div>
+
   <div class="app">
     <!-- Links oben: Lieblingsgerichte -->
     <section class="card" id="card-favorites">
@@ -514,6 +565,10 @@
     const weekNextEl = document.getElementById("week-next");
     const weekCurrentRangeEl = document.getElementById("week-current-range");
     const weekNextRangeEl = document.getElementById("week-next-range");
+
+    const overlayEl = document.getElementById("slideshow-overlay");
+    const IDLE_MS = 5 * 60 * 1000; // 5 Minuten
+    let idleTimer = null;
 
     function getMealById(id) {
       return state.meals.find(m => m.id === id) || null;
@@ -764,7 +819,7 @@
       alert(text);
     }
 
-    // Events
+    // Form & Events
     document.getElementById("meal-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const nameInput = document.getElementById("meal-name");
@@ -816,6 +871,38 @@
     }
 
     renderAll();
+
+    // Inaktivität / Slideshow-Overlay
+
+    function showSlideshow() {
+      overlayEl.style.display = "block";
+    }
+
+    function hideSlideshow() {
+      overlayEl.style.display = "none";
+    }
+
+    function resetIdleTimer() {
+      if (idleTimer) clearTimeout(idleTimer);
+      // Wenn Slideshow aktiv ist und der Nutzer tippt, schließen
+      if (overlayEl.style.display === "block") {
+        hideSlideshow();
+      }
+      idleTimer = setTimeout(() => {
+        showSlideshow();
+      }, IDLE_MS);
+    }
+
+    overlayEl.addEventListener("click", () => {
+      hideSlideshow();
+      resetIdleTimer();
+    });
+
+    ["click","touchstart","mousemove","keydown"].forEach(evt => {
+      window.addEventListener(evt, resetIdleTimer, {passive:true});
+    });
+
+    resetIdleTimer();
 
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
