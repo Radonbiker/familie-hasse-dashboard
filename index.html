@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Familie Hasse Dashboard – Essensplan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg-top: #2b1b13;
+      --bg-bottom: #140d0a;
+      --wood: #3c2417;
+      --wood-light: #5a3722;
+      --card: #22140e;
+      --card-alt: #2c1a11;
+      --accent: #e0a15b;
+      --accent-soft: #f3c48a;
+      --text-main: #f6e7d5;
+      --text-soft: #c8a88a;
+      --shadow-soft: 0 6px 18px rgba(0,0,0,0.45);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, var(--wood-light) 0, var(--bg-top) 40%, var(--bg-bottom) 100%);
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    .app {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 12px 14px 28px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #51311f 0%, #2d1b12 100%);
+      color: #fef7ec;
+      padding: 16px 18px;
+      border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.6);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    header h1 span.icon {
+      font-size: 1.8rem;
+    }
+
+    header p {
+      margin: 5px 0 0;
+      font-size: 0.9rem;
+      color: var(--text-soft);
+    }
+
+    .content {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .panel {
+      background: linear-gradient(145deg, rgba(34,20,14,0.95), rgba(18,10,7,0.98));
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(255,255,255,0.02);
+    }
+
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+      color: var(--accent-soft);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel small {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+    }
+
+    /* Layout: Querformat */
+    .layout-row {
+      display: grid;
+      grid-template-columns: minmax(320px, 1.2fr) minmax(480px, 2fr);
+      gap: 12px;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .layout-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Meal library */
+
+    .meal-library {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .meal-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .meal-card {
+      background: radial-gradient(circle at top left, #5d3722 0, #24140d 55%, #140b07 100%);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: grab;
+      border: 1px solid rgba(0,0,0,0.4);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.6);
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      min-height: 90px;
+    }
+
+    .meal-card:active {
+      cursor: grabbing;
+      transform: translateY(1px);
+    }
+
+    .meal-image-wrap {
+      position: relative;
+      overflow: hidden;
+      background: #3a2418;
+    }
+
+    .meal-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: saturate(1.15);
+    }
+
+    .meal-info {
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .meal-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fdf4e5;
+    }
+
+    .meal-sub {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+    }
+
+    .meal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .meal-form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .meal-form input {
+      flex: 1 1 auto;
+      min-width: 0;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 7px 11px;
+      font-size: 0.85rem;
+      background: rgba(10,6,4,0.9);
+      color: var(--text-main);
+    }
+
+    .meal-form input::placeholder {
+      color: #8f6d4d;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: none;
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      background: var(--accent);
+      color: #24140c;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    .btn.small {
+      padding: 6px 10px;
+      font-size: 0.78rem;
+    }
+
+    .btn.secondary {
+      background: #4a3220;
+      color: var(--text-soft);
+    }
+
+    .btn:hover {
+      filter: brightness(1.05);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+
+    /* Weeks */
+
+    .weeks-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .weeks-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 1024px) {
+      .weeks-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .week {
+      background: radial-gradient(circle at top, rgba(73,47,29,0.9) 0, rgba(19,11,7,0.98) 60%);
+      border-radius: 14px;
+      padding: 10px;
+      border: 1px solid rgba(255,255,255,0.03);
+      box-shadow: 0 7px 18px rgba(0,0,0,0.6);
+    }
+
+    .week-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .week-header h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--accent-soft);
+    }
+
+    .week-header span {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+    }
+
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 4px;
+      font-size: 0.78rem;
+    }
+
+    @media (max-width: 1200px) {
+      .week-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    .day-column {
+      background: rgba(15,9,6,0.9);
+      border-radius: 10px;
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .day-name {
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-align: center;
+      color: #f8e6d4;
+    }
+
+    .slot {
+      background: radial-gradient(circle at top, #3b2516 0, #1b100a 65%);
+      border-radius: 8px;
+      padding: 6px;
+      min-height: 70px;
+      border: 1px dashed rgba(255,255,255,0.14);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      justify-content: center;
+      align-items: stretch;
+      transition: background 0.1s, border-color 0.1s, transform 0.08s;
+    }
+
+    .slot-label {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-soft);
+    }
+
+    .slot.empty .slot-content {
+      font-size: 0.8rem;
+      color: #705035;
+      text-align: center;
+    }
+
+    .slot.drag-over {
+      background: radial-gradient(circle at top, #6b4526 0, #24140f 70%);
+      border-color: var(--accent-soft);
+      transform: translateY(-1px);
+    }
+
+    .slot-content {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Shopping list */
+
+    .shopping-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .shopping-list {
+      margin: 0;
+      padding-left: 20px;
+      max-height: 180px;
+      overflow-y: auto;
+      font-size: 0.85rem;
+    }
+
+    .shopping-list li {
+      margin-bottom: 3px;
+    }
+
+    footer {
+      margin-top: 12px;
+      font-size: 0.75rem;
+      text-align: center;
+      color: var(--text-soft);
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1><span class="icon">🍽️</span> Familie Hasse – Essensplan</h1>
+      <p>Wandpanel im Flur – zwei Wochen im Blick. Gerichte antippen, ziehen & planen.</p>
+    </header>
+
+    <div class="content">
+      <div class="layout-row">
+        <!-- Meal library -->
+        <section class="panel meal-library">
+          <h2>Gerichte</h2>
+          <small>Gericht antippen & ziehen, dann in einen Tag/Slot fallen lassen.</small>
+          <div id="meal-list" class="meal-list"></div>
+          <form id="meal-form" class="meal-form">
+            <div class="meal-form-row">
+              <input id="meal-name" type="text" placeholder="Neues Gericht (z. B. Spinat mit Kartoffeln)" required />
+            </div>
+            <div class="meal-form-row">
+              <input id="meal-image" type="url" placeholder="Bild-URL (optional – Rezeptfoto o.ä.)" />
+              <button type="submit" class="btn small">➕ Gericht hinzufügen</button>
+            </div>
+          </form>
+          <small>Die Gerichte bleiben auf dem Wand-iPad gespeichert. Liste kann jederzeit erweitert werden.</small>
+        </section>
+
+        <!-- Weeks + shopping -->
+        <section class="weeks-panel">
+          <section class="panel">
+            <h2>Wochenplan</h2>
+            <small>Links aktuelle Woche, rechts nächste Woche. Tippen auf einen Slot löscht den Eintrag nach Bestätigung.</small>
+            <div class="weeks-grid">
+              <section class="week" data-week="0">
+                <div class="week-header">
+                  <h3>Aktuelle Woche</h3>
+                  <span id="week0-range"></span>
+                </div>
+                <div class="week-grid" id="week0-grid"></div>
+              </section>
+
+              <section class="week" data-week="1">
+                <div class="week-header">
+                  <h3>Nächste Woche</h3>
+                  <span id="week1-range"></span>
+                </div>
+                <div class="week-grid" id="week1-grid"></div>
+              </section>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>🛒 Einkaufsliste</h2>
+            <div class="shopping-actions">
+              <button id="btn-generate-shopping" class="btn">Einkaufsliste aktualisieren</button>
+              <button id="btn-clear-all" class="btn secondary small">Alle Slots leeren</button>
+            </div>
+            <ul id="shopping-list" class="shopping-list"></ul>
+          </section>
+        </section>
+      </div>
+
+      <footer>
+        Alle Daten werden lokal auf diesem iPad gespeichert. Kein Internet, kein Account. Einfach für die Familie Hasse. ❤️
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "familie_hasse_essenplan_v3";
+
+    const defaultMeals = [
+      { id: "pizza", name: "Pizza Margherita", image: "https://images.pexels.com/photos/825661/pexels-photo-825661.jpeg?auto=compress&cs=tinysrgb&w=800" },
+      { id: "nudeln-bolo", name: "Nudeln Bolognese", image: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=800" },
+      { id: "spinat-kartoffeln", name: "Spinat mit Kartoffeln", image: "https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg?auto=compress&cs=tinysrgb&w=800" },
+      { id: "haehnchen-gemuese", name: "Hähnchen mit Gemüse", image: "https://images.pexels.com/photos/4106483/pexels-photo-4106483.jpeg?auto=compress&cs=tinysrgb&w=800" },
+      { id: "fischstaebchen", name: "Fischstäbchen mit Kartoffelbrei", image: "https://images.pexels.com/photos/16049096/pexels-photo-16049096/free-photo-of-meal-fish-and-butternut-squash-on-plate-on-a-tray.jpeg?auto=compress&cs=tinysrgb&w=800" },
+      { id: "pfannkuchen", name: "Pfannkuchen süß", image: "https://images.pexels.com/photos/4109990/pexels-photo-4109990.jpeg?auto=compress&cs=tinysrgb&w=800" },
+      { id: "suppe", name: "Gemüsesuppe", image: "https://images.pexels.com/photos/1438672/pexels-photo-1438672.jpeg?auto=compress&cs=tinysrgb&w=800" },
+      { id: "burger", name: "Burger & Ofenkartoffeln", image: "https://images.pexels.com/photos/1639562/pexels-photo-1639562.jpeg?auto=compress&cs=tinysrgb&w=800" }
+    ];
+
+    const dayNames = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+
+    function createEmptyWeek() {
+      const days = [];
+      for (let i = 0; i < 7; i++) {
+        days.push({ lunch: null, dinner: null });
+      }
+      return { days };
+    }
+
+    function getMonday(date = new Date()) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = (day === 0 ? -6 : 1 - day);
+      d.setDate(d.getDate() + diff);
+      d.setHours(0,0,0,0);
+      return d;
+    }
+
+    function formatDateRange(mondayDate) {
+      const start = new Date(mondayDate);
+      const end = new Date(mondayDate);
+      end.setDate(end.getDate() + 6);
+      const fmt = d => d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
+      return fmt(start) + " – " + fmt(end);
+    }
+
+    function baseState() {
+      const monday = getMonday();
+      return {
+        meals: defaultMeals,
+        weeks: [createEmptyWeek(), createEmptyWeek()],
+        week0Monday: monday.toISOString(),
+        createdAt: new Date().toISOString()
+      };
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return baseState();
+        const state = JSON.parse(raw);
+
+        if (!state.weeks || state.weeks.length !== 2) {
+          state.weeks = [createEmptyWeek(), createEmptyWeek()];
+        }
+        if (!state.week0Monday) {
+          state.week0Monday = getMonday().toISOString();
+        }
+
+        const storedMonday = new Date(state.week0Monday);
+        const currentMonday = getMonday();
+        const diffDays = Math.floor((currentMonday - storedMonday) / (1000 * 60 * 60 * 24));
+
+        if (diffDays >= 7) {
+          state.weeks[0] = state.weeks[1];
+          state.weeks[1] = createEmptyWeek();
+          state.week0Monday = currentMonday.toISOString();
+        }
+
+        return state;
+      } catch (e) {
+        console.error("Fehler beim Laden des Zustands", e);
+        return baseState();
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    let state = loadState();
+
+    const mealListEl = document.getElementById("meal-list");
+    const week0GridEl = document.getElementById("week0-grid");
+    const week1GridEl = document.getElementById("week1-grid");
+    const week0RangeEl = document.getElementById("week0-range");
+    const week1RangeEl = document.getElementById("week1-range");
+    const shoppingListEl = document.getElementById("shopping-list");
+
+    function getMealById(id) {
+      return state.meals.find(m => m.id === id) || null;
+    }
+
+    function renderMeals() {
+      mealListEl.innerHTML = "";
+      state.meals.forEach(meal => {
+        const card = document.createElement("div");
+        card.className = "meal-card";
+        card.draggable = true;
+        card.dataset.mealId = meal.id;
+
+        const imgWrap = document.createElement("div");
+        imgWrap.className = "meal-image-wrap";
+        if (meal.image) {
+          const img = document.createElement("img");
+          img.src = meal.image;
+          img.alt = meal.name;
+          imgWrap.appendChild(img);
+        }
+
+        const info = document.createElement("div");
+        info.className = "meal-info";
+        const title = document.createElement("div");
+        title.className = "meal-title";
+        title.textContent = meal.name;
+        const sub = document.createElement("div");
+        sub.className = "meal-sub";
+        sub.textContent = "Ziehen zum Planen";
+
+        info.appendChild(title);
+        info.appendChild(sub);
+
+        card.appendChild(imgWrap);
+        card.appendChild(info);
+
+        card.addEventListener("dragstart", (e) => {
+          e.dataTransfer.setData("text/plain", meal.id);
+          e.dataTransfer.effectAllowed = "copy";
+        });
+
+        mealListEl.appendChild(card);
+      });
+    }
+
+    function renderWeeks() {
+      const week0Monday = new Date(state.week0Monday);
+      const week1Monday = new Date(week0Monday);
+      week1Monday.setDate(week1Monday.getDate() + 7);
+
+      week0RangeEl.textContent = formatDateRange(week0Monday);
+      week1RangeEl.textContent = formatDateRange(week1Monday);
+
+      renderWeek(0, week0GridEl);
+      renderWeek(1, week1GridEl);
+    }
+
+    function renderWeek(weekIndex, containerEl) {
+      containerEl.innerHTML = "";
+      const week = state.weeks[weekIndex];
+
+      for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+        const dayCol = document.createElement("div");
+        dayCol.className = "day-column";
+
+        const dayLabel = document.createElement("div");
+        dayLabel.className = "day-name";
+        dayLabel.textContent = dayNames[dayIndex];
+        dayCol.appendChild(dayLabel);
+
+        const lunchSlot = createSlot(weekIndex, dayIndex, "lunch");
+        const dinnerSlot = createSlot(weekIndex, dayIndex, "dinner");
+
+        dayCol.appendChild(lunchSlot);
+        dayCol.appendChild(dinnerSlot);
+
+        containerEl.appendChild(dayCol);
+      }
+    }
+
+    function createSlot(weekIndex, dayIndex, slotKey) {
+      const slotEl = document.createElement("div");
+      slotEl.className = "slot";
+      slotEl.dataset.week = String(weekIndex);
+      slotEl.dataset.day = String(dayIndex);
+      slotEl.dataset.slot = slotKey;
+
+      const label = document.createElement("div");
+      label.className = "slot-label";
+      label.textContent = slotKey === "lunch" ? "Mittag" : "Abend";
+
+      const content = document.createElement("div");
+      content.className = "slot-content";
+
+      const mealId = state.weeks[weekIndex].days[dayIndex][slotKey];
+      if (mealId) {
+        const meal = getMealById(mealId);
+        if (meal) {
+          content.textContent = meal.name;
+          slotEl.classList.remove("empty");
+        } else {
+          content.textContent = "(Gericht gelöscht)";
+          slotEl.classList.add("empty");
+        }
+      } else {
+        content.textContent = "Gericht hierher ziehen";
+        slotEl.classList.add("empty");
+      }
+
+      slotEl.appendChild(label);
+      slotEl.appendChild(content);
+
+      slotEl.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        slotEl.classList.add("drag-over");
+      });
+
+      slotEl.addEventListener("dragleave", () => {
+        slotEl.classList.remove("drag-over");
+      });
+
+      slotEl.addEventListener("drop", (e) => {
+        e.preventDefault();
+        slotEl.classList.remove("drag-over");
+        const mealIdDrop = e.dataTransfer.getData("text/plain");
+        if (!mealIdDrop) return;
+        state.weeks[weekIndex].days[dayIndex][slotKey] = mealIdDrop;
+        saveState();
+        renderWeeks();
+      });
+
+      slotEl.addEventListener("click", () => {
+        const currentId = state.weeks[weekIndex].days[dayIndex][slotKey];
+        if (!currentId) return;
+        const meal = getMealById(currentId);
+        const confirmClear = confirm("Soll \"" + (meal?.name || "dieser Eintrag") + "\" wirklich entfernt werden?");
+        if (confirmClear) {
+          state.weeks[weekIndex].days[dayIndex][slotKey] = null;
+          saveState();
+          renderWeeks();
+        }
+      });
+
+      return slotEl;
+    }
+
+    function renderShoppingList() {
+      shoppingListEl.innerHTML = "";
+      const items = new Set();
+
+      state.weeks.forEach(week => {
+        week.days.forEach(day => {
+          ["lunch", "dinner"].forEach(slotKey => {
+            const mealId = day[slotKey];
+            if (mealId) {
+              const meal = getMealById(mealId);
+              if (meal) {
+                items.add(meal.name);
+              }
+            }
+          });
+        });
+      });
+
+      if (items.size === 0) {
+        const li = document.createElement("li");
+        li.textContent = "Noch keine Gerichte ausgewählt.";
+        shoppingListEl.appendChild(li);
+        return;
+      }
+
+      [...items].sort().forEach(name => {
+        const li = document.createElement("li");
+        li.textContent = name;
+        shoppingListEl.appendChild(li);
+      });
+    }
+
+    // Event-Handler
+
+    document.getElementById("meal-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const nameInput = document.getElementById("meal-name");
+      const imageInput = document.getElementById("meal-image");
+      const name = nameInput.value.trim();
+      const image = imageInput.value.trim();
+
+      if (!name) return;
+
+      const idBase = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      let id = idBase || ("meal-" + Date.now());
+      let i = 1;
+      while (state.meals.some(m => m.id === id)) {
+        id = idBase + "-" + i++;
+      }
+
+      state.meals.push({ id, name, image: image || "" });
+      saveState();
+      renderMeals();
+
+      nameInput.value = "";
+      imageInput.value = "";
+    });
+
+    document.getElementById("btn-generate-shopping").addEventListener("click", () => {
+      renderShoppingList();
+    });
+
+    document.getElementById("btn-clear-all").addEventListener("click", () => {
+      if (!confirm("Alle Einträge in beiden Wochen wirklich löschen?")) return;
+      state.weeks = [createEmptyWeek(), createEmptyWeek()];
+      saveState();
+      renderWeeks();
+      renderShoppingList();
+    });
+
+    renderMeals();
+    renderWeeks();
+    renderShoppingList();
+  </script>
+</body>
+</html>
