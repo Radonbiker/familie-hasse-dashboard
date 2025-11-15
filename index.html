@@ -1,484 +1,645 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8" />
-<title>Familie Hasse – Essensplan</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <title>Familie Hasse – Essensplan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a100b" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root {
+      --wood-dark: #1a100b;
+      --wood: #25170f;
+      --wood-light: #3d2518;
+      --accent: #e0a15b;
+      --accent-soft: #f3c48a;
+      --text: #f6e7d5;
+      --text-soft: #c8a88a;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at top, var(--wood-light), var(--wood-dark));
+      color: var(--text);
+      overflow-x: hidden;
+    }
+    header {
+      background: linear-gradient(135deg, #4d2e1c, #1d120c);
+      color: var(--text);
+      padding: 12px 18px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      position:sticky;
+      top:0;
+      z-index:10;
+      box-shadow:0 4px 18px rgba(0,0,0,0.4);
+    }
+    header small {
+      font-size:0.8rem;
+      color:var(--text-soft);
+      font-weight:400;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 10px 12px 20px;
+      display:grid;
+      grid-template-columns: 0.9fr 1.4fr;
+      gap:12px;
+    }
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+    .panel {
+      background: rgba(0,0,0,0.35);
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    }
+    .panel h2 {
+      margin: 0 0 6px;
+      font-size: 1.05rem;
+      color: var(--accent-soft);
+    }
+    small { color: var(--text-soft); }
 
-<style>
-:root {
-  --wood-dark: #1a100b;
-  --wood: #25170f;
-  --wood-light: #3d2518;
-  --accent: #e0a15b;
-  --accent-soft: #f3c48a;
-  --text: #f6e7d5;
-  --text-soft: #c8a88a;
-}
+    /* Lieblingsbubbles */
+    .fav-grid {
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:6px;
+      margin-bottom:8px;
+    }
+    .fav-bubble {
+      background: rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 6px 4px;
+      text-align:center;
+      font-size:0.78rem;
+      cursor:grab;
+      user-select:none;
+      border:1px solid rgba(255,255,255,0.18);
+    }
+    .fav-bubble span {
+      display:block;
+      font-size:1.2rem;
+      margin-bottom:3px;
+    }
+    .fav-bubble:active {
+      transform:scale(0.96);
+      opacity:0.9;
+    }
 
-/* ---------- BASIS ---------- */
+    /* Kategorien */
+    .category {
+      background: rgba(0,0,0,0.22);
+      border-radius: 10px;
+      margin-bottom: 6px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.08);
+    }
+    .category-header {
+      padding:6px 8px;
+      font-size:0.9rem;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      cursor:pointer;
+      background:rgba(255,255,255,0.06);
+    }
+    .category-content {
+      display:none;
+      padding:6px;
+    }
+    .category-content.open { display:block; }
+    .cat-item {
+      padding:4px 6px;
+      border-radius:8px;
+      font-size:0.84rem;
+      background:rgba(255,255,255,0.06);
+      cursor:grab;
+      margin-bottom:4px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .cat-item span.emoji { font-size:1.1rem; }
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
-  background: radial-gradient(circle at top, var(--wood-light), var(--wood-dark));
-  color: var(--text);
-  overflow-x: hidden;
-}
+    /* Gerichte-Liste */
+    .meal-list {
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+      max-height:220px;
+      overflow-y:auto;
+      margin-top:6px;
+      padding-right:3px;
+    }
+    .meal-card {
+      display:flex;
+      align-items:center;
+      background:rgba(255,255,255,0.08);
+      padding:5px 8px;
+      border-radius:9px;
+      cursor:grab;
+      user-select:none;
+      border:1px solid rgba(255,255,255,0.08);
+      font-size:0.86rem;
+    }
+    .meal-card span.emoji {
+      font-size:1.1rem;
+      margin-right:6px;
+    }
+    .meal-card span.name {
+      flex:1;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .meal-card .delete {
+      font-size:1.05rem;
+      cursor:pointer;
+      margin-left:8px;
+      opacity:0.8;
+    }
+    .meal-card .delete:hover { opacity:1; }
 
-header {
-  background: linear-gradient(135deg, #4d2e1c, #1d120c);
-  color: var(--text);
-  padding: 16px 20px;
-  font-size: 1.5rem;
-  font-weight: 600;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  position:sticky;
-  top:0;
-  z-index:50;
-  box-shadow:0 4px 20px rgba(0,0,0,0.4);
-}
+    .meal-form {
+      margin-top:8px;
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+    }
+    .meal-form input {
+      padding:6px 8px;
+      border-radius:9px;
+      border:none;
+      background:rgba(0,0,0,0.55);
+      color:var(--text);
+      font-size:0.86rem;
+    }
+    .meal-form button {
+      padding:7px 8px;
+      border-radius:9px;
+      border:none;
+      background:var(--accent);
+      color:#2a150a;
+      font-weight:600;
+      font-size:0.9rem;
+      cursor:pointer;
+    }
 
-/* ---------- LAYOUT ---------- */
+    /* Wochenplan */
+    .week-grid {
+      display:grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap:8px;
+    }
+    @media (max-width: 1100px) {
+      .week-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+    .day-col {
+      background:rgba(255,255,255,0.05);
+      padding:5px;
+      border-radius:10px;
+      font-size:0.8rem;
+    }
+    .day-title {
+      font-weight:600;
+      margin-bottom:3px;
+      text-align:center;
+    }
+    .slot {
+      background:rgba(0,0,0,0.25);
+      padding:5px;
+      margin-top:4px;
+      border-radius:8px;
+      border:1px dashed rgba(255,255,255,0.15);
+      min-height:54px;
+    }
+    .slot-label {
+      font-size:0.72rem;
+      color:var(--text-soft);
+      text-transform:uppercase;
+      letter-spacing:0.06em;
+    }
+    .slot-content {
+      margin-top:2px;
+      font-size:0.86rem;
+      font-weight:600;
+      min-height:1.2em;
+    }
+    .slot.empty .slot-content {
+      font-size:0.78rem;
+      color:#9c7a54;
+    }
+    .slot.drag-over {
+      background:rgba(250,210,140,0.16);
+      border-color:var(--accent-soft);
+    }
 
-.container {
-  display: grid;
-  grid-template-columns: 0.95fr 1.4fr;
-  gap: 14px;
-  padding: 14px;
-}
-
-.panel {
-  background: rgba(0,0,0,0.35);
-  padding: 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.06);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
-}
-
-.panel h2 {
-  margin: 0 0 8px;
-  font-size: 1.1rem;
-  color: var(--accent-soft);
-}
-
-small { color: var(--text-soft); }
-
-/* ---------- LIEBLINGSBUBBLES ---------- */
-
-.fav-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.fav-bubble {
-  background: rgba(255,255,255,0.09);
-  border-radius: 12px;
-  padding: 8px 4px;
-  text-align:center;
-  font-size:0.78rem;
-  cursor:grab;
-  user-select:none;
-  border:1px solid rgba(255,255,255,0.12);
-}
-
-.fav-bubble span {
-  display:block;
-  font-size:1.25rem;
-  margin-bottom:3px;
-}
-
-.fav-bubble:active {
-  transform:scale(0.95);
-  opacity:0.85;
-}
-
-/* ---------- KATEGORIEN ---------- */
-
-.category {
-  background: rgba(0,0,0,0.22);
-  border-radius: 10px;
-  margin-bottom: 8px;
-  overflow:hidden;
-  border:1px solid rgba(255,255,255,0.08);
-}
-
-.category-header {
-  padding:8px 10px;
-  font-size:1rem;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  cursor:pointer;
-  background:rgba(255,255,255,0.05);
-}
-
-.category-content {
-  display:none;
-  padding:8px;
-}
-
-.category-content.open { display:block; }
-
-.cat-item {
-  padding:6px 8px;
-  border-radius:8px;
-  font-size:0.9rem;
-  background:rgba(255,255,255,0.06);
-  cursor:grab;
-  margin-bottom:5px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.cat-item span.emoji {
-  font-size:1.2rem;
-}
-
-/* ---------- GERICHTSLISTE (SORTIERBAR) ---------- */
-
-.meal-list {
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  max-height:350px;
-  overflow-y:auto;
-  padding-right:3px;
-}
-
-.meal-card {
-  display:flex;
-  align-items:center;
-  background:rgba(255,255,255,0.08);
-  padding:6px 10px;
-  border-radius:10px;
-  cursor:grab;
-  user-select:none;
-  border:1px solid rgba(255,255,255,0.08);
-}
-
-.meal-card span.emoji {
-  font-size:1.2rem;
-  margin-right:8px;
-}
-
-.meal-card span.name {
-  flex:1;
-}
-
-.meal-card .delete {
-  font-size:1.2rem;
-  cursor:pointer;
-  margin-left:10px;
-  opacity:0.8;
-}
-
-.meal-card .delete:hover {
-  opacity:1;
-}
-
-/* ---------- SLOTS ---------- */
-
-.week-grid {
-  display:grid;
-  grid-template-columns:repeat(7, 1fr);
-  gap:10px;
-}
-
-.day-col {
-  background:rgba(255,255,255,0.05);
-  padding:6px;
-  border-radius:10px;
-}
-
-.slot {
-  background:rgba(0,0,0,0.25);
-  padding:6px;
-  margin-top:6px;
-  border-radius:8px;
-  border:1px dashed rgba(255,255,255,0.15);
-  min-height:60px;
-}
-
-.slot.drag-over {
-  background:rgba(255,255,255,0.1);
-  border-color:var(--accent-soft);
-}
-
-.slot-label {
-  font-size:0.75rem;
-  color:var(--text-soft);
-}
-
-.slot-content {
-  margin-top:3px;
-  font-size:0.9rem;
-  font-weight:600;
-}
-</style>
+    footer {
+      text-align:center;
+      font-size:0.75rem;
+      color:var(--text-soft);
+      padding:6px 0 12px;
+    }
+  </style>
 </head>
-
 <body>
+  <header>
+    <span>🍽️</span>
+    <div>
+      Familie Hasse – Essensplan<br/>
+      <small>Lieblingsessen, Kategorien & Wochenplan – optimiert fürs Wand‑iPad</small>
+    </div>
+  </header>
 
-<header>🍽️ Familie Hasse – Essensplan</header>
+  <div class="container">
+    <div class="panel">
+      <h2>Lieblingsessen</h2>
+      <small>Antippen für „Tap‑Drop“ oder ziehen zum Planen. Reihenfolge oben = Reihenfolge hier.</small>
+      <div id="fav-grid" class="fav-grid"></div>
 
-<div class="container">
+      <h2 style="margin-top:10px;">Kategorien</h2>
+      <div id="categories"></div>
 
-<!-- ░░░░░ LINKS: Essen-Auswahl ░░░░░ -->
+      <h2 style="margin-top:10px;">Alle Gerichte</h2>
+      <small>Hier kannst du Gerichte hinzufügen, sortieren oder löschen.</small>
+      <div id="meal-list" class="meal-list"></div>
 
-<div class="panel">
+      <form id="meal-form" class="meal-form">
+        <input id="meal-name" placeholder="Gericht (z. B. Spinat mit Kartoffeln)" required />
+        <input id="meal-emoji" placeholder="Emoji (optional, z. B. 🍝)" />
+        <button type="submit">➕ Gericht hinzufügen</button>
+      </form>
+    </div>
 
-<h2>Lieblingsessen</h2>
-<small>8 Favoriten – drag, drop oder tippen</small>
+    <div class="panel">
+      <h2>Wochenplan</h2>
+      <small>Mittag & Abend – Drag & Drop oder Tap‑Drop. Tippen auf einen Slot leert ihn.</small>
+      <div id="week-grid" class="week-grid"></div>
+    </div>
+  </div>
 
-<div id="fav-grid" class="fav-grid"></div>
+  <footer>
+    Alles wird lokal im Browser gespeichert. Als App vom Home‑Bildschirm starten = perfekte Wandsteuerung. ❤️
+  </footer>
 
-<h2>Kategorien</h2>
-<div id="categories"></div>
+  <script>
+    const STORAGE_KEY = "familie_hasse_essenplan_pwa_v1";
 
-<h2>Alle Gerichte</h2>
-<small>Sortierbar, erweiterbar, löschbar</small>
+    const defaultMeals = [
+      {id:"spagbol", name:"Spaghetti Bolognese", emoji:"🍝"},
+      {id:"gulasch", name:"Gulasch", emoji:"🍲"},
+      {id:"rouladen", name:"Rouladen mit Klößen", emoji:"🥩"},
+      {id:"pizza", name:"Pizza", emoji:"🍕"},
+      {id:"klopse", name:"Königsberger Klopse", emoji:"🍖"},
+      {id:"schnipom", name:"Schnitzel mit Pommes", emoji:"🍟"},
+      {id:"bowl", name:"Bowl", emoji:"🥗"},
+      {id:"geschnetzeltes", name:"Geschnetzeltes", emoji:"🍛"},
+    ];
 
-<div id="meal-list" class="meal-list"></div>
+    const defaultFavorites = ["spagbol","gulasch","rouladen","pizza","klopse","schnipom","bowl","geschnetzeltes"];
 
-<form id="meal-form" style="margin-top:10px;">
-  <input id="meal-name" placeholder="Gericht" required style="width:100%;padding:8px;border-radius:8px;margin-bottom:6px;border:none;">
-  <input id="meal-emoji" placeholder="Emoji (🍕)" style="width:100%;padding:8px;border-radius:8px;margin-bottom:6px;border:none;">
-  <button style="width:100%;padding:8px;background:var(--accent);border:none;border-radius:8px;font-weight:600;">
-    ➕ Gericht hinzufügen
-  </button>
-</form>
+    const defaultCategories = {
+      "🍝 Nudeln": [
+        {id:"nudeln-tomate", name:"Nudeln mit Tomatensauce", emoji:"🍝"},
+        {id:"mac-cheese", name:"Mac & Cheese", emoji:"🧀"},
+        {id:"nudelsuppe", name:"Nudelsuppe", emoji:"🍜"},
+      ],
+      "🥩 Fleisch": [
+        {id:"gyros", name:"Gyros", emoji:"🥩"},
+        {id:"frikadellen", name:"Frikadellen", emoji:"🍖"},
+      ],
+      "🥗 Leicht & Bowl": [
+        {id:"gemuesepfanne", name:"Gemüsepfanne", emoji:"🥦"},
+        {id:"reis-bowl", name:"Reis-Bowl", emoji:"🥗"},
+      ],
+      "🍕 Schnell": [
+        {id:"hotdog", name:"Hotdog", emoji:"🌭"},
+        {id:"sandwich", name:"Sandwich", emoji:"🥪"},
+        {id:"roesti", name:"Kartoffelrösti", emoji:"🥔"},
+      ],
+      "🍲 Suppe & Eintopf": [
+        {id:"kartoffelsuppe", name:"Kartoffelsuppe", emoji:"🥣"},
+        {id:"tomatensuppe", name:"Tomatensuppe", emoji:"🍅"},
+        {id:"chili", name:"Chili", emoji:"🌶️"},
+      ]
+    };
 
-</div>
+    const dayNames = ["Mo","Di","Mi","Do","Fr","Sa","So"];
 
-<!-- ░░░░░ RECHTS: Wochenplan ░░░░░ -->
+    function createEmptyWeek() {
+      const week = [];
+      for (let i = 0; i < 7; i++) {
+        week.push({ lunch: null, dinner: null });
+      }
+      return week;
+    }
 
-<div class="panel">
-<h2>Wochenplan</h2>
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          return {
+            meals: [...defaultMeals],
+            favorites: [...defaultFavorites],
+            categories: defaultCategories,
+            week: createEmptyWeek(),
+          };
+        }
+        const parsed = JSON.parse(raw);
+        if (!parsed.meals) parsed.meals = [...defaultMeals];
+        if (!parsed.favorites) parsed.favorites = [...defaultFavorites];
+        if (!parsed.categories) parsed.categories = defaultCategories;
+        if (!parsed.week) parsed.week = createEmptyWeek();
+        return parsed;
+      } catch (e) {
+        console.error("Fehler beim Laden, setze zurück:", e);
+        return {
+          meals: [...defaultMeals],
+          favorites: [...defaultFavorites],
+          categories: defaultCategories,
+          week: createEmptyWeek(),
+        };
+      }
+    }
 
-<div class="week-grid" id="week-grid"></div>
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.error("Speichern fehlgeschlagen:", e);
+      }
+    }
 
-</div>
+    let state = loadState();
+    let activeTapMealId = null;
 
-</div>
+    const favGridEl = document.getElementById("fav-grid");
+    const categoriesEl = document.getElementById("categories");
+    const mealListEl = document.getElementById("meal-list");
+    const weekGridEl = document.getElementById("week-grid");
 
-<script>
-/* ========= BASISDATEN ========= */
+    function getMealById(id) {
+      return state.meals.find(m => m.id === id) || null;
+    }
 
-let meals = [
-  {id:"spagbol", name:"Spaghetti Bolognese", emoji:"🍝"},
-  {id:"gulasch", name:"Gulasch", emoji:"🍲"},
-  {id:"rouladen", name:"Rouladen mit Klößen", emoji:"🥩"},
-  {id:"pizza", name:"Pizza", emoji:"🍕"},
-  {id:"klopse", name:"Königsberger Klopse", emoji:"🍖"},
-  {id:"schnipom", name:"Schnitzel mit Pommes", emoji:"🍟"},
-  {id:"bowl", name:"Bowl", emoji:"🥗"},
-  {id:"geschnetzeltes", name:"Geschnetzeltes", emoji:"🍛"},
-];
-
-let favorites = ["spagbol","gulasch","rouladen","pizza","klopse","schnipom","bowl","geschnetzeltes"];
-
-/* Kategorien */
-const categories = {
-  "🍝 Nudeln": [
-    {id:"boloreload", name:"Nudeln mit Tomatensoße", emoji:"🍝"},
-    {id:"mac", name:"Mac & Cheese", emoji:"🧀"},
-    {id:"ramsuppe", name:"Nudelsuppe", emoji:"🍜"}
-  ],
-  "🥩 Fleisch": [
-    {id:"gyros", name:"Gyros", emoji:"🥩"},
-    {id:"frikadellen", name:"Frikadellen", emoji:"🍖"}
-  ],
-  "🥗 Leicht": [
-    {id:"pfanne", name:"Gemüsepfanne", emoji:"🥦"}
-  ],
-  "🍕 Schnell": [
-    {id:"hotdog", name:"Hotdog", emoji:"🌭"},
-    {id:"sandwich", name:"Sandwich", emoji:"🥪"},
-    {id:"roesti", name:"Kartoffelrösti", emoji:"🥔"}
-  ],
-  "🍲 Suppe": [
-    {id:"kartoffelsuppe", name:"Kartoffelsuppe", emoji:"🥣"},
-    {id:"tomatensuppe", name:"Tomatensuppe", emoji:"🍅"}
-  ]
-};
-
-/* ========= RENDER-FUNKTIONEN ========= */
-
-function renderFavorites() {
-  const el = document.getElementById("fav-grid");
-  el.innerHTML = "";
-
-  favorites.forEach(fid => {
-    const m = meals.find(x => x.id === fid);
-    if (!m) return;
-
-    const div = document.createElement("div");
-    div.className = "fav-bubble";
-    div.innerHTML = `<span>${m.emoji}</span>${m.name}`;
-    div.draggable = true;
-
-    div.addEventListener("dragstart", e => {
-      e.dataTransfer.setData("text/plain", m.id);
-    });
-
-    div.addEventListener("click", () => {
-      activeTapMeal = m.id;
-      alert(`${m.name} wählen und Slot antippen.`);
-    });
-
-    el.appendChild(div);
-  });
-}
-
-function renderCategories() {
-  const el = document.getElementById("categories");
-  el.innerHTML = "";
-
-  Object.entries(categories).forEach(([cat, items]) => {
-    const wrap = document.createElement("div");
-    wrap.className = "category";
-
-    const head = document.createElement("div");
-    head.className = "category-header";
-    head.innerHTML = `${cat} <span>▼</span>`;
-
-    const cont = document.createElement("div");
-    cont.className = "category-content";
-
-    items.forEach(m => {
-      const item = document.createElement("div");
-      item.className = "cat-item";
-      item.draggable = true;
-      item.innerHTML = `<span class="emoji">${m.emoji}</span>${m.name}`;
-      item.addEventListener("dragstart", e => {
-        e.dataTransfer.setData("text/plain", m.id);
+    function renderFavorites() {
+      favGridEl.innerHTML = "";
+      state.favorites.forEach(id => {
+        const meal = getMealById(id);
+        if (!meal) return;
+        const div = document.createElement("div");
+        div.className = "fav-bubble";
+        div.draggable = true;
+        div.innerHTML = `<span>${meal.emoji || "🍽️"}</span>${meal.name}`;
+        div.addEventListener("dragstart", e => {
+          e.dataTransfer.setData("text/plain", meal.id);
+          e.dataTransfer.effectAllowed = "copyMove";
+        });
+        div.addEventListener("click", () => {
+          activeTapMealId = meal.id;
+        });
+        favGridEl.appendChild(div);
       });
-      item.addEventListener("click", () => {
-        activeTapMeal = m.id;
-        alert(`${m.name} wählen und Slot antippen.`);
+    }
+
+    function renderCategories() {
+      categoriesEl.innerHTML = "";
+      Object.entries(state.categories).forEach(([catTitle, items]) => {
+        const wrap = document.createElement("div");
+        wrap.className = "category";
+        const head = document.createElement("div");
+        head.className = "category-header";
+        head.innerHTML = `<span>${catTitle}</span><span>▼</span>`;
+        const content = document.createElement("div");
+        content.className = "category-content";
+        items.forEach(meal => {
+          const item = document.createElement("div");
+          item.className = "cat-item";
+          item.draggable = true;
+          item.innerHTML = `<span class="emoji">${meal.emoji || "🍽️"}</span><span>${meal.name}</span>`;
+          item.addEventListener("dragstart", e => {
+            e.dataTransfer.setData("text/plain", meal.id);
+            e.dataTransfer.effectAllowed = "copyMove";
+          });
+          item.addEventListener("click", () => {
+            activeTapMealId = meal.id;
+          });
+          content.appendChild(item);
+        });
+        head.addEventListener("click", () => {
+          content.classList.toggle("open");
+        });
+        wrap.appendChild(head);
+        wrap.appendChild(content);
+        categoriesEl.appendChild(wrap);
       });
-      cont.appendChild(item);
-    });
+    }
 
-    head.addEventListener("click", () => {
-      cont.classList.toggle("open");
-    });
+    let dragMealId = null;
+    let dragOverMealId = null;
 
-    wrap.appendChild(head);
-    wrap.appendChild(cont);
-    el.appendChild(wrap);
-  });
-}
+    function renderMealList() {
+      mealListEl.innerHTML = "";
+      state.meals.forEach(meal => {
+        const card = document.createElement("div");
+        card.className = "meal-card";
+        card.draggable = true;
+        card.dataset.id = meal.id;
+        card.innerHTML = `
+          <span class="emoji">${meal.emoji || "🍽️"}</span>
+          <span class="name">${meal.name}</span>
+          <span class="delete">🗑️</span>
+        `;
 
-function renderMealList() {
-  const el = document.getElementById("meal-list");
-  el.innerHTML = "";
+        card.addEventListener("dragstart", e => {
+          dragMealId = meal.id;
+          e.dataTransfer.setData("text/plain", meal.id);
+          e.dataTransfer.effectAllowed = "move";
+        });
 
-  meals.forEach(m => {
-    const div = document.createElement("div");
-    div.className = "meal-card";
-    div.draggable = true;
+        card.addEventListener("dragover", e => {
+          e.preventDefault();
+          e.stopPropagation();
+          dragOverMealId = meal.id;
+        });
 
-    div.innerHTML = `
-      <span class="emoji">${m.emoji}</span>
-      <span class="name">${m.name}</span>
-      <span class="delete">🗑️</span>
-    `;
+        card.addEventListener("drop", e => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!dragMealId || dragMealId === meal.id) return;
+          const fromIndex = state.meals.findIndex(m => m.id === dragMealId);
+          const toIndex = state.meals.findIndex(m => m.id === meal.id);
+          if (fromIndex === -1 || toIndex === -1) return;
+          const [moved] = state.meals.splice(fromIndex, 1);
+          state.meals.splice(toIndex, 0, moved);
+          state.favorites = state.favorites.filter(id => state.meals.some(m => m.id === id));
+          saveState();
+          renderAll();
+          dragMealId = null;
+          dragOverMealId = null;
+        });
 
-    div.addEventListener("dragstart", e => {
-      e.dataTransfer.setData("text/plain", m.id);
-    });
+        card.addEventListener("click", () => {
+          activeTapMealId = meal.id;
+        });
 
-    div.querySelector(".delete").addEventListener("click", () => {
-      if (!confirm(`"${m.name}" löschen?`)) return;
-      meals = meals.filter(x => x.id !== m.id);
-      favorites = favorites.filter(x => x !== m.id);
+        card.querySelector(".delete").addEventListener("click", e => {
+          e.stopPropagation();
+          if (!confirm(`"${meal.name}" wirklich löschen?`)) return;
+          state.meals = state.meals.filter(m => m.id !== meal.id);
+          state.favorites = state.favorites.filter(id => id !== meal.id);
+          state.week.forEach(day => {
+            if (day.lunch === meal.id) day.lunch = null;
+            if (day.dinner === meal.id) day.dinner = null;
+          });
+          saveState();
+          renderAll();
+        });
+
+        mealListEl.appendChild(card);
+      });
+    }
+
+    function renderWeek() {
+      weekGridEl.innerHTML = "";
+      state.week.forEach((day, index) => {
+        const col = document.createElement("div");
+        col.className = "day-col";
+        const title = document.createElement("div");
+        title.className = "day-title";
+        title.textContent = dayNames[index];
+        col.appendChild(title);
+        ["lunch","dinner"].forEach(slotKey => {
+          const slotEl = document.createElement("div");
+          slotEl.className = "slot";
+          slotEl.dataset.day = index;
+          slotEl.dataset.slot = slotKey;
+          const label = document.createElement("div");
+          label.className = "slot-label";
+          label.textContent = slotKey === "lunch" ? "Mittag" : "Abend";
+          const content = document.createElement("div");
+          content.className = "slot-content";
+          const mealId = day[slotKey];
+          if (mealId) {
+            const meal = getMealById(mealId);
+            if (meal) {
+              content.textContent = `${meal.emoji || "🍽️"} ${meal.name}`;
+            } else {
+              content.textContent = "(Gericht nicht mehr vorhanden)";
+            }
+          } else {
+            content.textContent = "Gericht hierher ziehen oder auswählen";
+            slotEl.classList.add("empty");
+          }
+          slotEl.appendChild(label);
+          slotEl.appendChild(content);
+
+          slotEl.addEventListener("dragover", e => {
+            e.preventDefault();
+            e.stopPropagation();
+            slotEl.classList.add("drag-over");
+          });
+          slotEl.addEventListener("dragleave", e => {
+            e.preventDefault();
+            e.stopPropagation();
+            slotEl.classList.remove("drag-over");
+          });
+          slotEl.addEventListener("drop", e => {
+            e.preventDefault();
+            e.stopPropagation();
+            slotEl.classList.remove("drag-over");
+            const mealIdDrop = e.dataTransfer.getData("text/plain");
+            if (!mealIdDrop) return;
+            const meal = getMealById(mealIdDrop);
+            if (!meal) return;
+            const d = parseInt(slotEl.dataset.day, 10);
+            const key = slotEl.dataset.slot;
+            state.week[d][key] = meal.id;
+            saveState();
+            renderWeek();
+          });
+
+          slotEl.addEventListener("click", () => {
+            const d = parseInt(slotEl.dataset.day, 10);
+            const key = slotEl.dataset.slot;
+            if (activeTapMealId) {
+              const meal = getMealById(activeTapMealId);
+              if (!meal) return;
+              state.week[d][key] = meal.id;
+              activeTapMealId = null;
+              saveState();
+              renderWeek();
+            } else if (state.week[d][key]) {
+              if (confirm("Eintrag löschen?")) {
+                state.week[d][key] = null;
+                saveState();
+                renderWeek();
+              }
+            }
+          });
+
+          col.appendChild(slotEl);
+        });
+        weekGridEl.appendChild(col);
+      });
+    }
+
+    const formEl = document.getElementById("meal-form");
+    formEl.addEventListener("submit", e => {
+      e.preventDefault();
+      const nameInput = document.getElementById("meal-name");
+      const emojiInput = document.getElementById("meal-emoji");
+      const name = nameInput.value.trim();
+      const emoji = emojiInput.value.trim() || "🍽️";
+      if (!name) return;
+      const idBase = name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      let id = idBase || ("meal-" + Date.now());
+      let i = 1;
+      while (state.meals.some(m => m.id === id)) {
+        id = idBase + "-" + i++;
+      }
+      state.meals.push({ id, name, emoji });
+      saveState();
+      nameInput.value = "";
+      emojiInput.value = "";
       renderAll();
     });
 
-    el.appendChild(div);
-  });
-}
+    function renderAll() {
+      renderFavorites();
+      renderCategories();
+      renderMealList();
+      renderWeek();
+    }
 
-function renderWeek() {
-  const el = document.getElementById("week-grid");
-  el.innerHTML = "";
+    renderAll();
 
-  const days = ["Mo","Di","Mi","Do","Fr","Sa","So"];
-
-  for (let d=0; d<7; d++) {
-    const col = document.createElement("div");
-    col.className="day-col";
-    col.innerHTML = `<div style="font-weight:600;margin-bottom:4px;">${days[d]}</div>`;
-
-    ["Mittag","Abend"].forEach(slot => {
-      const slotEl = document.createElement("div");
-      slotEl.className="slot";
-      slotEl.innerHTML = `
-        <div class="slot-label">${slot}</div>
-        <div class="slot-content"></div>
-      `;
-
-      slotEl.addEventListener("dragover", e => e.preventDefault());
-      slotEl.addEventListener("drop", e => {
-        const id = e.dataTransfer.getData("text/plain");
-        slotEl.querySelector(".slot-content").innerText =
-          meals.find(m => m.id===id)?.emoji + " " +
-          meals.find(m => m.id===id)?.name;
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch(err => {
+          console.warn("Service Worker Registrierung fehlgeschlagen:", err);
+        });
       });
-
-      slotEl.addEventListener("click", () => {
-        if (activeTapMeal) {
-          const m = meals.find(x=>x.id===activeTapMeal);
-          slotEl.querySelector(".slot-content").innerText = m.emoji + " " + m.name;
-          activeTapMeal = null;
-        }
-      });
-
-      col.appendChild(slotEl);
-    });
-
-    el.appendChild(col);
-  }
-}
-
-/* ========= GERICHTE HINZUFÜGEN ========= */
-
-document.getElementById("meal-form").addEventListener("submit", e => {
-  e.preventDefault();
-  const name = document.getElementById("meal-name").value.trim();
-  const emoji = document.getElementById("meal-emoji").value.trim() || "🍽️";
-
-  const id = name.toLowerCase().replace(/[^a-z0-9]+/g,"-");
-
-  meals.push({id,name,emoji});
-  document.getElementById("meal-name").value="";
-  document.getElementById("meal-emoji").value="";
-
-  renderAll();
-});
-
-/* ========= TAP-DROP ========= */
-
-let activeTapMeal = null;
-
-/* ========= ALLES RENDERN ========= */
-
-function renderAll() {
-  renderFavorites();
-  renderCategories();
-  renderMealList();
-  renderWeek();
-}
-
-renderAll();
-</script>
-
+    }
+  </script>
 </body>
 </html>
