@@ -2,13 +2,13 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Familie Hasse – Essensplan</title>
+  <title>Essensplan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#1a100b" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="apple-touch-icon" href="app-icon.png" />
   <style>
     :root {
       --bg-top: #25160f;
@@ -354,7 +354,6 @@
     }
 
     /* Slideshow-Overlay */
-
     #slideshow-overlay {
       position: fixed;
       inset: 0;
@@ -410,7 +409,7 @@
     <!-- Links oben: Lieblingsgerichte -->
     <section class="card" id="card-favorites">
       <h2>Lieblingsgerichte</h2>
-      <small>Antippen, dann unten einen Slot berühren. Gelb = aktuell ausgewählt.</small>
+      <small>Antippen, dann einen Slot berühren. Gelb = aktuell ausgewählt.</small>
       <div id="fav-grid" class="fav-grid"></div>
     </section>
 
@@ -464,7 +463,7 @@
   </footer>
 
   <script>
-    const STORAGE_KEY = "familie_hasse_essenplan_v5";
+    const STORAGE_KEY = "familie_hasse_essenplan_v6";
 
     const defaultMeals = [
       {id:"spagbol", name:"Spaghetti Bolognese", emoji:"🍝"},
@@ -530,7 +529,6 @@
         if (!st.weekNext) st.weekNext = createEmptyWeek();
         if (!st.currentMondayISO) st.currentMondayISO = getMonday().toISOString();
 
-        // Wochenrotation: wenn eine ganze Woche vergangen ist
         const storedMonday = new Date(st.currentMondayISO);
         const nowMonday = getMonday();
         const diffDays = Math.floor((nowMonday - storedMonday) / (1000*60*60*24));
@@ -567,8 +565,6 @@
     const weekNextRangeEl = document.getElementById("week-next-range");
 
     const overlayEl = document.getElementById("slideshow-overlay");
-    const IDLE_MS = 5 * 60 * 1000; // 5 Minuten
-    let idleTimer = null;
 
     function getMealById(id) {
       return state.meals.find(m => m.id === id) || null;
@@ -819,7 +815,6 @@
       alert(text);
     }
 
-    // Form & Events
     document.getElementById("meal-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const nameInput = document.getElementById("meal-name");
@@ -872,38 +867,36 @@
 
     renderAll();
 
-    // Inaktivität / Slideshow-Overlay
+    // -----------------------------
+    // Inaktivitäts-Erkennung (15s)
+    // -----------------------------
+    const IDLE_MS = 15000; // 15 Sekunden für Test
+    let lastInteraction = Date.now();
 
-    function showSlideshow() {
-      overlayEl.style.display = "block";
-    }
-
-    function hideSlideshow() {
-      overlayEl.style.display = "none";
-    }
-
-    function resetIdleTimer() {
-      if (idleTimer) clearTimeout(idleTimer);
-      // Wenn Slideshow aktiv ist und der Nutzer tippt, schließen
+    function userActive() {
+      lastInteraction = Date.now();
       if (overlayEl.style.display === "block") {
-        hideSlideshow();
+        overlayEl.style.display = "none";
       }
-      idleTimer = setTimeout(() => {
-        showSlideshow();
-      }, IDLE_MS);
     }
-
-    overlayEl.addEventListener("click", () => {
-      hideSlideshow();
-      resetIdleTimer();
-    });
 
     ["click","touchstart","mousemove","keydown"].forEach(evt => {
-      window.addEventListener(evt, resetIdleTimer, {passive:true});
+      window.addEventListener(evt, userActive, {passive:true});
     });
 
-    resetIdleTimer();
+    setInterval(() => {
+      const now = Date.now();
+      if (now - lastInteraction > IDLE_MS && overlayEl.style.display !== "block") {
+        overlayEl.style.display = "block";
+      }
+    }, 2000);
 
+    overlayEl.addEventListener("click", () => {
+      overlayEl.style.display = "none";
+      userActive();
+    });
+
+    // Service Worker registrieren
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker.register("sw.js").catch(err => {
